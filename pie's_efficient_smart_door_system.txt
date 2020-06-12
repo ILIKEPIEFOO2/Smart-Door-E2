@@ -13,6 +13,28 @@ if(first()){
     )
     DoorsLookUp=invert(Doors)
     WhiteListLookUp=invert(WhiteListed)
+    
+    function void onWhitelistedEntry(Door:entity, Player:entity, Index:number){
+        #print("Whitelisted player "+Player:name()+" is next to ",Door)
+        if(!Door["IsOpen",number]){
+            timer("Open"+"|||"+Index,0)
+            timer("Close"+"|||"+Index,6000)
+        }
+    }
+    function void onNonWhitelistedEntry(Door:entity, Player:entity, Index:number){
+        #print("Non-Whitelisted player "+Player:name()+" is next to ",Door)
+    }
+    function void onOpen(Door:entity){
+        Door:noDraw(1)
+        Door:noCollideAll(1)
+    }
+    function void onClose(Door:entity){
+        Door:noDraw(0)
+        Door:noCollideAll(0)
+    }
+    
+    
+    
     runOnChat(1)
 }
 if(clkName():find("|||")){
@@ -21,33 +43,18 @@ if(clkName():find("|||")){
         case "Open",
             Door = Doors[Data[2,string]:toNumber(),entity]
             Door["IsOpen",number] = 1
+            onOpen(Door)
         break
         case "Close",
             Door = Doors[Data[2,string]:toNumber(),entity]
             Door["IsOpen",number] = 0
+            onClose(Door)
         break
     }
 }
 if(first()){
     rangerPersist(1)
     rangerIgnoreWorld(1)
-    function void onWhitelistedEntry(Door:entity, Player:entity, Index:number){
-        print("Whitelisted player "+Player:name()+" is next to ",Door)
-        if(!Door["IsOpen",number]){
-            timer("Open"+"|||"+Index,0)
-        }else{
-            
-        }
-    }
-    function void onNonWhitelistedEntry(Door:entity, Player:entity, Index:number){
-        print("Non-Whitelisted player "+Player:name()+" is next to ",Door)
-    }
-    function void onOpen(Door:entity){
-        
-    }
-    function void onClose(Door:entity){
-        
-    }
     
     
     
@@ -218,11 +225,11 @@ if(first()){
     
     function entity searchForPlayer(Person:string){
         local P=findPlayerBySteamID64(Person)
-        if (!(P:isPlayer())){
+        if (!P:isPlayer()){
             P=findPlayerBySteamID(Person)
-            if (!(P:isPlayer())){
+            if (!P:isPlayer()){
                 P=findPlayerByName(Person)
-                if (!(P:isPlayer())){            
+                if (!P:isPlayer()){            
                     print("Invalid Player")
                 }
             }
@@ -288,5 +295,4 @@ if(clk("Check")){
         }
         timer("Check",CheckDelay)
     }
-}
-
+}-
